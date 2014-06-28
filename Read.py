@@ -25,32 +25,37 @@ while continue_reading:
 
     # If a card is found
     if status == MIFAREReader.MI_OK:
-        print "Card detected"
+        print "Card detected: Type " +str(TagType)
     
-    # Get the UID of the card
-    (status,uid) = MIFAREReader.MFRC522_Anticoll()
-
-    # If we have the UID, continue
-    if status == MIFAREReader.MI_OK:
-
-        # Print UID
-        print "Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
-    
-        # This is the default key for authentication
-        key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
-        
-        # Select the scanned tag
-        MIFAREReader.MFRC522_SelectTag(uid)
-
-        # Authenticate
-        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
-
-        # Check if authenticated
+        ## Get the UID of the card (also selects card)  
+        (status,uid) = MIFAREReader.MFRC522_GetUID()
+                       
+        # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
-            MIFAREReader.MFRC522_Read(8)
-            MIFAREReader.MFRC522_StopCrypto1()
-        else:
-            print "Authentication error"
+          
+            # Print UID
+            uidh = map(hex, uid)
+            uidh = map(str, uidh)
+            
+            print "UID Length: "+str(len(uid))
+            print "Card read UID: "+ ", ".join(map(str,uid))
+            print "Card read HEX: "+ ", ".join(uidh)
+        
+            # Select key for authentication
+            key = MIFAREReader.defaultKeyA
 
-        # Make sure to stop scanning for cards
-        continue_reading = false
+            # Authenticate
+            status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
+
+            # Check if authenticated
+            if status == MIFAREReader.MI_OK:
+                MIFAREReader.MFRC522_Read(8)
+                MIFAREReader.MFRC522_StopCrypto1()
+            else:
+                print "Authentication error"
+
+            # Stop scanning for cards
+            continue_reading = False
+        
+        #Tidy up GPIO
+        GPIO.cleanup()

@@ -27,68 +27,65 @@ while continue_reading:
     if status == MIFAREReader.MI_OK:
         print "Card detected"
     
-    # Get the UID of the card
-    (status,uid) = MIFAREReader.MFRC522_Anticoll()
+        # Get the UID of the card
+        (status,uid) = MIFAREReader.MFRC522_GetUID()
 
-    # If we have the UID, continue
-    if status == MIFAREReader.MI_OK:
-
-        # Print UID
-        print "Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
-    
-        # This is the default key for authentication
-        key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
-        
-        # Select the scanned tag
-        MIFAREReader.MFRC522_SelectTag(uid)
-
-        # Authenticate
-        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
-        print "\n"
-
-        # Check if authenticated
+        # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
 
-            # Variable for the data to write
-            data = []
+            # Print UID
+            print "Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
+        
+            # This is the default key for authentication
+            key = MIFAREReader.defaultKeyA
 
-            # Fill the data with 0xFF
-            for x in range(0,16):
-                data.append(0xFF)
-
-            print "Sector 8 looked like this:"
-            # Read block 8
-            MIFAREReader.MFRC522_Read(8)
+            # Authenticate
+            status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
             print "\n"
 
-            print "Sector 8 will now be filled with 0xFF:"
-            # Write the data
-            MIFAREReader.MFRC522_Write(8, data)
-            print "\n"
+            # Check if authenticated
+            if status == MIFAREReader.MI_OK:
 
-            print "It now looks like this:"
-            # Check to see if it was written
-            MIFAREReader.MFRC522_Read(8)
-            print "\n"
+                # Variable for the data to write
+                data = []
 
-            data = []
-            # Fill the data with 0x00
-            for x in range(0,16):
-                data.append(0x00)
+                # Fill the data with 0xFF
+                for x in range(0,16):
+                    data.append(0xFF)
 
-            print "Now we fill it with 0x00:"
-            MIFAREReader.MFRC522_Write(8, data)
-            print "\n"
+                print "Sector 8 looked like this:"
+                # Read block 8
+                MIFAREReader.MFRC522_Read(8)
+                print "\n"
 
-            print "It is now empty:"
-            # Check to see if it was written
-            MIFAREReader.MFRC522_Read(8)
-            print "\n"
+                print "Sector 8 will now be filled with 0xFF:"
+                # Write the data
+                MIFAREReader.MFRC522_Write(8, data)
+                print "\n"
 
-            # Stop
-            MIFAREReader.MFRC522_StopCrypto1()
+                print "It now looks like this:"
+                # Check to see if it was written
+                MIFAREReader.MFRC522_Read(8)
+                print "\n"
 
-            # Make sure to stop reading for cards
-            continue_reading = False
-        else:
-            print "Authentication error"
+                data = []
+                # Fill the data with 0x00
+                for x in range(0,16):
+                    data.append(0x00)
+
+                print "Now we fill it with 0x00:"
+                MIFAREReader.MFRC522_Write(8, data)
+                print "\n"
+
+                print "It is now empty:"
+                # Check to see if it was written
+                MIFAREReader.MFRC522_Read(8)
+                print "\n"
+
+                # Stop
+                MIFAREReader.MFRC522_StopCrypto1()
+
+                # Make sure to stop reading for cards
+                continue_reading = False
+            else:
+                print "Authentication error"

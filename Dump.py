@@ -27,23 +27,24 @@ while continue_reading:
     if status == MIFAREReader.MI_OK:
         print "Card detected"
     
-    # Get the UID of the card
-    (status,uid) = MIFAREReader.MFRC522_Anticoll()
+        # Get the UID of the card (also selects card)
+        (status,uid) = MIFAREReader.MFRC522_GetUID()
 
-    # If we have the UID, continue
-    if status == MIFAREReader.MI_OK:
+        # If we have the UID, continue
+        if status == MIFAREReader.MI_OK:
 
-        # Print UID
-        print "Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
-    
-        # This is the default key for authentication
-        key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+            # Print UID
+            print "UID Length: "+str(len(uid))
+            print "Card read UID: "+ ", ".join(map(str,uid))
         
-        # Select the scanned tag
-        MIFAREReader.MFRC522_SelectTag(uid)
+            # This is the default key for authentication
+            key = MIFAREReader.defaultKeyA
 
-        # Dump the data
-        MIFAREReader.MFRC522_DumpClassic1K(key, uid)
+            # Dump the data
+            MIFAREReader.MFRC522_DumpClassic1K(key, uid)
 
-        # Stop
-        MIFAREReader.MFRC522_StopCrypto1()
+            # Stop
+            MIFAREReader.MFRC522_StopCrypto1()
+
+            # Stop checking for chips
+            continue_reading = False
