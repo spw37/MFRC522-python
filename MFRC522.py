@@ -349,7 +349,7 @@ class MFRC522:
     # Next we append the last 4 bytes of the UID
     authuid=serNum[len(serNum)-4:len(serNum)]
     buff+=authuid
-    print "Auth ID :"+",".join(map(str,authuid))
+    #print "Auth ID :"+",".join(map(str,authuid))
 
     # Now we start the authentication itself
     (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_AUTHENT,buff)
